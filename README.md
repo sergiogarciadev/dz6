@@ -30,26 +30,36 @@ Alternatively, download the [release](https://github.com/mentebinaria/dz6/releas
 
 ## Usage
 
-    dz6 [OPTIONS] <FILE>
+```
+Usage: dz6 [OPTIONS] <FILE>
 
-    Arguments:
-    <FILE>  File to edit
+Arguments:
+  <FILE>  File to open
 
-    Options:
-    -o, --offset <OFFSET>  Initial file offset (hexadecimal is the default; add a `t` suffix for decimal) [default: 0]
-    -h, --help             Print help
-    -V, --version          Print version
+Options:
+  -o, --offset <OFFSET>  Initial cursor offset (hex default; `t` suffix = decimal) [default: 0]
+  -r, --readonly         Set read-only mode
+  -h, --help             Print help
+  -V, --version          Print version
+```
 
 Once you load a file in **dz6**, you can use the commands below.
 
-### Global keybindings
+### Global key bindings
 
-| Key            | Action          | Tips |
-| ---            | ---             | ---  |
-| `Enter`        | Switch views    | |
-| `F1`           | Help            | |
-| `Alt+l`        | Open log window | |
-| `Esc`          | Quit            | |
+| Key            | Action           |
+| ---            | ---              |
+| `Enter`        | Switch views     |
+| `F1`           | Help             |
+| `Alt+l`        | Open log window  |
+| `:`            | Open command bar | See [Commands](#commands) |
+
+#### Commands
+
+| Command   | Action       | Tips |
+| ---       | ---          | ---    |
+| <number>  | Go to offset | hex default; `t` suffix = decimal; `+` prefix = incremental jump |
+| q         | Quit         | |
 
 ### Hex view
 
@@ -64,11 +74,10 @@ Once you load a file in **dz6**, you can use the commands below.
 | `Ctrl+End` or `Shift+G` | Go to the last offset in the file | |
 | `Page Down`             | Move down one page | A page has 1KB by default |
 | `Page Up`               | Move up one page | |
-| `r` or `F3`             | Enter [replace mode](#hex-replace-mode) | |
+| `r`                     | Enter [replace mode](#hex-replace-mode) | |
 | `z`                     | Enter replace mode and set the byte under the cursor zero | |
 | `Ctrl+a`                | Enter replace mode and increment byte under the cursor | |
 | `Ctrl+x`                | Enter replace mode and decrement byte under the cursor | |
-| `:` or `Ctrl+g`         | Go to offset | Defaults to hex. Use `t` suffix for decimal and `+` prefix for incremental jump. |
 | `/`                     | Search | Search the entire file. `Tab` cycles between ASCII and hex search |
 | `n`                     | Search next | |
 | `s`                     | Open [Strings](#strings) window | |
@@ -80,7 +89,7 @@ Once you load a file in **dz6**, you can use the commands below.
 | `Alt+0`                 | Clear bookmarks | |
 | `Alt+h`                 | Toggle byte highlight | |
 | `;`                     | Add a comment to the selected offset | |
-| `F12`                   | Open [Names](#names) window. Added comments will be there. | |
+| `Ant+n`                 | Open [Names](#names) window. Added comments will be there. | |
 | `?`                     | Open [Calculator](#calculator) | |
 
 #### Hex replace mode
@@ -95,7 +104,7 @@ Once you load a file in **dz6**, you can use the commands below.
 | `Enter`           | Save changes to file | |
 | `Esc`             | Cancel changes | |
 | `Tab`             | Cycle through hex and ASCII dump to edit the file in ASCII | |
-| `F10`             | Truncate the file at the selected offset | Be aware this can't be undone |
+| `T`               | Truncate the file at the selected offset | Be aware this can't be undone |
 
 #### Names
 
