@@ -28,13 +28,14 @@ pub fn status_bar_draw(app: &mut App, frame: &mut Frame, area: Rect) {
 
     let mode = match app.state {
         UIState::HexEditing => "REPLACE",
-        _ => {
+        UIState::DialogSearch => {
             if app.hex_view.search.mode == SearchMode::Hex {
                 "SEARCH/HEX"
             } else {
-                "NORMAL"
+                "SEARCH/UTF-8"
             }
         }
+        _ => "NORMAL",
     };
 
     let fname = app.file_info.name.clone();
