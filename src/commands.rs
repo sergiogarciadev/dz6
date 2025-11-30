@@ -1,10 +1,10 @@
-use crate::{app::App, util::parse_offset};
+use crate::{app::App, util::parse_offset, widgets::MessageType};
 use ratatui::{
     Frame,
     widgets::{Clear, Paragraph},
 };
 
-use crate::{editor::UIState, widgets::ErrorMessage};
+use crate::{editor::UIState, widgets::Message};
 
 use clap::{Parser, Subcommand};
 use ratatui::crossterm::event::{Event, KeyCode};
@@ -16,6 +16,9 @@ pub struct Commands;
 #[derive(Subcommand, Debug)]
 enum Command {
     Q,
+    W,
+    Wq,
+    X,
     Cmt {
         offset: String,
         comment: String,
@@ -66,6 +69,17 @@ fn parse_command(app: &mut App, cmdline: &str) {
         Ok(cli) => match cli.command {
             // quit
             Some(Command::Q) => app.running = false,
+            // write to file
+            Some(Command::W) => {
+                let _ = app.write_to_file();
+                app.dialog_renderer = None;
+            }
+            // write and quit
+            Some(Command::Wq) | Some(Command::X) => {
+                let _ = app.write_to_file();
+                app.dialog_renderer = None;
+                app.running = false;
+            }
             // comment <offset> <comment>
             Some(Command::Cmt { offset, comment }) => {
                 if let Ok(mut ofs) = parse_offset(&offset) {
@@ -181,16 +195,16 @@ pub fn command_events(app: &mut App, event: &Event) -> Result<bool> {
 }
 
 pub fn command_error_invalid_offset_draw(app: &mut App, frame: &mut Frame) {
-    let mut dialog = ErrorMessage::new();
-    dialog.buffer = format!(
+    let mut dialog = Message::from(&format!(
         "Invalid offset. Maximum offset for this file: {:X}",
         app.file_info.size - 1
-    );
+    ));
+    dialog.kind = MessageType::Error;
     dialog.render(app, frame);
 }
 
 pub fn command_error_invalid_draw(app: &mut App, frame: &mut Frame) {
-    let mut dialog = ErrorMessage::new();
-    dialog.buffer = String::from("Invalid command");
+    let mut dialog = Message::from("Invalid command");
+    dialog.kind = MessageType::Error;
     dialog.render(app, frame);
 }

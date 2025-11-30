@@ -264,11 +264,36 @@ impl App {
         Ok(())
     }
 
+    /// write what's cached to the buffer, but not to the file yet
+    pub fn write_to_buffer(&mut self, changed: HashMap<usize, String>) {
+        let ofs = self.hex_view.offset;
+        let mut total_written = 0usize;
+
+        for (k, v) in &changed {
+            self.read_chunk_for_offset(*k);
+            if let Ok(b) = u8::from_str_radix(v, 16) {
+                let buf_ofs = k % APP_CACHE_SIZE;
+                self.buffer[buf_ofs] = b;
+                total_written += 1;
+            }
+        }
+
+        App::log(
+            self,
+            format!("{} bytes written to buffer: {:?}", total_written, changed),
+        );
+
+        // restore state
+        self.goto(ofs);
+    }
+
     /// write what's cached to the actual file
-    pub fn write_file_at_offset(&mut self) -> io::Result<()> {
+    pub fn write_to_file(&mut self) -> io::Result<()> {
         if self.file_info.file.is_none() {
             return Err(io::Error::other("file not open"));
         }
+
+        let mut total_written = 0;
 
         if let Some(f) = &mut self.file_info.file {
             // changed bytes are not necessairily contiguous, so we
@@ -281,10 +306,12 @@ impl App {
                     if written != 1 {
                         return Err(io::Error::other("could not write to file"));
                     }
+                    total_written += written;
                 }
             }
         }
 
+        App::log(self, format!("{} bytes written to file", total_written));
         self.hex_view.changed_bytes.clear();
         Ok(())
     }

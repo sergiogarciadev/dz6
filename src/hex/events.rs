@@ -236,7 +236,6 @@ pub fn hex_mode_events(app: &mut App, key: KeyEvent) -> Result<bool> {
                 print!("\x07"); // beep
             } else if app.hex_view.offset < app.file_info.size {
                 app.state = UIState::HexEditing;
-                app.hex_view.changed_bytes.clear();
             }
         }
         // strings list
