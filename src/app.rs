@@ -5,6 +5,7 @@ use std::{
     path::Path,
 };
 
+use arboard::Clipboard;
 use evalexpr::HashMapContext;
 use ratatui::{
     Frame,
@@ -34,6 +35,34 @@ pub struct Point {
     pub y: usize,
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum Direction {
+    Left,
+    Right,
+}
+
+#[derive(Default, Debug, Clone, Copy)]
+pub struct Selection {
+    pub start: usize,
+    pub end: usize,
+    pub direction: Option<Direction>,
+}
+
+impl IntoIterator for Selection {
+    type Item = usize;
+    type IntoIter = std::ops::RangeInclusive<usize>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.start..=self.end
+    }
+}
+
+impl Selection {
+    pub fn contains(&self, offset: usize) -> bool {
+        offset >= self.start && offset <= self.end
+    }
+}
+
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct HexView {
     #[serde(skip)]
@@ -57,17 +86,13 @@ pub struct HexView {
     pub cursor: Point,
     #[serde(skip)]
     pub editing_hex: bool,
-    #[serde(skip)]
-    pub names_regex_input: Input,
-    #[serde(skip)]
-    pub strings_regex_input: Input,
-    #[serde(skip)]
     pub highlihts: HashSet<u8>, // byte highlight
     #[serde(skip)]
     pub last_visited_offset: usize,
     #[serde(skip)]
     pub names_list_state: ListState,
     #[serde(skip)]
+    pub names_regex_input: Input,
     pub names_regex: String,
     #[serde(skip)]
     pub offset_state: TableState,
@@ -75,6 +100,10 @@ pub struct HexView {
     pub offset: usize,
     #[serde(skip)]
     pub search: Search,
+    #[serde(skip)]
+    pub selection: Selection,
+    #[serde(skip)]
+    pub strings_regex_input: Input,
     #[serde(skip)]
     pub table_state: TableState,
 }
@@ -140,6 +169,7 @@ pub struct Calculator {
 pub struct App {
     pub buffer: [u8; APP_CACHE_SIZE],
     pub calculator: Calculator,
+    pub clipboard: Result<Clipboard, arboard::Error>,
     pub command_area: Rect,
     pub command_input: Input,
     pub config: Config,
@@ -164,6 +194,7 @@ impl App {
         App {
             buffer: [0u8; APP_CACHE_SIZE],
             calculator: Calculator::default(),
+            clipboard: Clipboard::new(),
             command_area: Rect::default(),
             command_input: Input::default(),
             config: Config {
