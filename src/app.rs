@@ -61,6 +61,7 @@ pub struct HexView {
     pub names_regex_input: Input,
     #[serde(skip)]
     pub strings_regex_input: Input,
+    #[serde(skip)]
     pub highlihts: HashSet<u8>, // byte highlight
     #[serde(skip)]
     pub last_visited_offset: usize,

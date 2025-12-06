@@ -5,6 +5,11 @@ use crate::app::App;
 
 impl App {
     pub fn save_database(&self) -> Result<(), Box<dyn Error>> {
+        // do not save a database if there's nothing to be saved
+        if self.hex_view.bookmarks.is_empty() && self.hex_view.comment_name_list.is_empty() {
+            return Ok(());
+        }
+
         let toml_string = toml::to_string_pretty(&self.hex_view)?;
         let dbname = self.file_info.name.clone() + ".dz6";
         fs::write(dbname, toml_string)?;
