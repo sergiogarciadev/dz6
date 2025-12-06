@@ -28,7 +28,7 @@ pub struct FileInfo {
 }
 
 // used in HexMode struct to track the cursor position
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug)]
 pub struct Point {
     pub x: usize,
     pub y: usize,
@@ -36,9 +36,12 @@ pub struct Point {
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct HexView {
+    #[serde(skip)]
     pub ascii_state: TableState,
     pub bookmarks: Vec<usize>,
+    #[serde(skip)]
     pub changed_bytes: HashMap<usize, String>,
+    #[serde(skip)]
     pub comment_input: Input, // the input comment widget (tui-input)
 
     // `comment_name_list` is used to show comments in Names list
@@ -50,28 +53,39 @@ pub struct HexView {
     // to handle that with a hash map
     pub comments: HashMap<usize, String>,
 
+    #[serde(skip)]
     pub cursor: Point,
+    #[serde(skip)]
     pub editing_hex: bool,
+    #[serde(skip)]
     pub names_regex_input: Input,
+    #[serde(skip)]
     pub strings_regex_input: Input,
     pub highlihts: HashSet<u8>, // byte highlight
+    #[serde(skip)]
     pub last_visited_offset: usize,
+    #[serde(skip)]
     pub names_list_state: ListState,
+    #[serde(skip)]
     pub names_regex: String,
+    #[serde(skip)]
     pub offset_state: TableState,
+    #[serde(skip)]
     pub offset: usize,
+    #[serde(skip)]
     pub search: Search,
+    #[serde(skip)]
     pub table_state: TableState,
 }
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug)]
 pub struct Search {
     pub input_text: Input,
     pub mode: SearchMode,
     pub input_hex: Input,
 }
 
-#[derive(Default, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, PartialEq)]
 pub enum SearchMode {
     #[default]
     Utf8,
