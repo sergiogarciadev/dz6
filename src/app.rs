@@ -13,6 +13,7 @@ use ratatui::{
     widgets::{ListState, TableState},
 };
 
+use serde::{Deserialize, Serialize};
 use tui_input::Input;
 
 use crate::{config::*, editor::*, reader::Reader, themes::*};
@@ -62,11 +63,14 @@ impl Selection {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct HexView {
+    #[serde(skip)]
     pub ascii_state: TableState,
     pub bookmarks: Vec<usize>,
+    #[serde(skip)]
     pub changed_bytes: HashMap<usize, String>,
+    #[serde(skip)]
     pub comment_input: Input, // the input comment widget (tui-input)
 
     // `comment_name_list` is used to show comments in Names list
@@ -78,18 +82,29 @@ pub struct HexView {
     // to handle that with a hash map
     pub comments: HashMap<usize, String>,
 
+    #[serde(skip)]
     pub cursor: Point,
+    #[serde(skip)]
     pub editing_hex: bool,
     pub highlihts: HashSet<u8>, // byte highlight
+    #[serde(skip)]
     pub last_visited_offset: usize,
+    #[serde(skip)]
     pub names_list_state: ListState,
+    #[serde(skip)]
     pub names_regex_input: Input,
     pub names_regex: String,
+    #[serde(skip)]
     pub offset_state: TableState,
+    #[serde(skip)]
     pub offset: usize,
+    #[serde(skip)]
     pub search: Search,
+    #[serde(skip)]
     pub selection: Selection,
+    #[serde(skip)]
     pub strings_regex_input: Input,
+    #[serde(skip)]
     pub table_state: TableState,
 }
 
@@ -133,7 +148,7 @@ pub struct FoundString {
     pub size: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Comment {
     pub offset: usize,
     pub comment: String,
@@ -183,6 +198,7 @@ impl App {
             command_area: Rect::default(),
             command_input: Input::default(),
             config: Config {
+                database: true,
                 dim_control_chars: false,
                 dim_zeroes: true,
                 hex_mode_bytes_per_line: 16,
@@ -272,6 +288,11 @@ impl App {
             self.goto(0);
         }
         self.goto(initial_offset);
+
+        // try to load a database for this file, but continue otherwise
+        if self.config.database {
+            let _ = self.load_database();
+        }
         Ok(())
     }
 

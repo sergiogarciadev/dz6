@@ -72,11 +72,17 @@ fn parse_command(app: &mut App, cmdline: &str) {
             // write to file
             Some(Command::W) => {
                 let _ = app.write_to_file();
+                if app.config.database {
+                    let _ = app.save_database();
+                }
                 app.dialog_renderer = None;
             }
             // write and quit
             Some(Command::Wq) | Some(Command::X) => {
                 let _ = app.write_to_file();
+                if app.config.database {
+                    let _ = app.save_database();
+                }
                 app.dialog_renderer = None;
                 app.running = false;
             }
@@ -118,6 +124,15 @@ fn parse_command(app: &mut App, cmdline: &str) {
                         let c = val.chars().next().unwrap_or('.');
                         app.config.hex_mode_non_graphic_char = c;
                     }
+                    app.dialog_renderer = None;
+                }
+                // save database files <filename>.dz6
+                "db" => {
+                    app.config.database = true;
+                    app.dialog_renderer = None;
+                }
+                "nodb" => {
+                    app.config.database = false;
                     app.dialog_renderer = None;
                 }
                 // dim (gray out) control bytes
