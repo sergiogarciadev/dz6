@@ -6,6 +6,9 @@ pub const APP_CACHE_SIZE: usize = 4096;
 // page size (amount of bytes)
 pub const APP_PAGE_SIZE: usize = APP_CACHE_SIZE / 4;
 
+// cache buffer size
+pub const APP_BUFFER_SIZE: usize = APP_CACHE_SIZE * 3;
+
 // command input history size
 pub const CMD_INPUT_HIST_SIZE: usize = 50;
 

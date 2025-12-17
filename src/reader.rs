@@ -1,4 +1,4 @@
-use crate::config::{APP_CACHE_SIZE, APP_PAGE_SIZE};
+use crate::config::{APP_BUFFER_SIZE, APP_CACHE_SIZE, APP_PAGE_SIZE};
 
 /// Reader is the class that implements the file
 /// reader and buffering. It reads the file in blocks
@@ -8,6 +8,8 @@ use crate::config::{APP_CACHE_SIZE, APP_PAGE_SIZE};
 
 #[derive(Default, Debug)]
 pub struct Reader {
+    pub buffer_start: usize,
+    pub buffer_end: usize,
     pub cache_block_number: usize,
     pub cache_blocks: usize,
     pub cache_start: usize,
@@ -26,6 +28,7 @@ impl Reader {
         Reader {
             cache_end: APP_CACHE_SIZE - 1,
             page_end: APP_PAGE_SIZE - 1,
+            buffer_end: APP_BUFFER_SIZE - 1,
             ..Default::default()
         }
     }

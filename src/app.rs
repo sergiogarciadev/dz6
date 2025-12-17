@@ -37,7 +37,7 @@ pub struct TextView {
 }
 
 pub struct App {
-    pub buffer: [u8; APP_CACHE_SIZE],
+    pub buffer: [u8; APP_BUFFER_SIZE],
     pub calculator: Calculator,
     pub clipboard: Result<Clipboard, arboard::Error>,
     pub command_area: Rect,
@@ -62,7 +62,7 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            buffer: [0u8; APP_CACHE_SIZE],
+            buffer: [0u8; APP_BUFFER_SIZE],
             calculator: Calculator::default(),
             clipboard: Clipboard::new(),
             command_area: Rect::default(),
@@ -179,9 +179,15 @@ impl App {
         }
 
         if let Some(f) = &mut self.file_info.file {
-            f.seek(SeekFrom::Start((nblock * APP_CACHE_SIZE) as u64))?;
+            let mut start_block = nblock;
+            if start_block > 0 {
+                start_block = start_block - 1;
+            }
+            f.seek(SeekFrom::Start((start_block * APP_CACHE_SIZE) as u64))?;
             let _ = f.read(&mut self.buffer)?;
             self.reader.cache_block_number = nblock;
+            self.reader.buffer_start = start_block * APP_CACHE_SIZE;
+            self.reader.buffer_end = self.reader.buffer_start + APP_BUFFER_SIZE;
             self.log(format!("read_chunk_from_file({nblock})"));
         }
         Ok(())
@@ -356,14 +362,10 @@ impl App {
     pub fn read_chunk_for_offset(&mut self, offset: usize) {
         let nblock = offset / APP_CACHE_SIZE;
 
-        if offset > self.reader.cache_end {
+        if offset > self.reader.cache_end || offset < self.reader.cache_start {
             self.read_chunk_from_file(nblock).unwrap();
-            self.reader.cache_start += nblock * APP_CACHE_SIZE;
-            self.reader.cache_end += nblock * APP_CACHE_SIZE;
-        } else if offset < self.reader.cache_start {
-            self.read_chunk_from_file(nblock).unwrap();
-            self.reader.cache_start -= APP_CACHE_SIZE;
-            self.reader.cache_end -= APP_CACHE_SIZE;
+            self.reader.cache_start = nblock * APP_CACHE_SIZE;
+            self.reader.cache_end = self.reader.cache_start + APP_CACHE_SIZE - 1;
         } else if offset == 0 {
             self.reader.cache_start = 0;
             self.reader.cache_end = APP_CACHE_SIZE - 1;
