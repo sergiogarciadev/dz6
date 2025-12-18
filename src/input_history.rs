@@ -1,6 +1,6 @@
+use crate::config::CMD_INPUT_HIST_SIZE;
 use std::collections::VecDeque; // VecDeque seems better
 use tui_input::Input;
-use crate::config::CMD_INPUT_HIST_SIZE;
 
 #[derive(Default)]
 pub struct InputHistory {

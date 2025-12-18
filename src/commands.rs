@@ -199,7 +199,7 @@ pub fn command_events(app: &mut App, event: &Event) -> Result<bool> {
                 app.state = UIState::Normal;
             }
             KeyCode::Enter => {
-                let v = app.command_input.input.value_and_reset();                
+                let v = app.command_input.input.value_and_reset();
                 parse_command(app, &v);
                 app.command_input.push(v);
             }

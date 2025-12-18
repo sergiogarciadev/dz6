@@ -8,13 +8,13 @@ mod events;
 mod global;
 mod hex;
 mod initfile;
+mod input_history;
 mod reader;
 mod ruler;
 mod text;
 mod themes;
 mod util;
 mod widgets;
-mod input_history;
 
 use std::process;
 
