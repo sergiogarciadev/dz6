@@ -42,6 +42,7 @@ fn try_goto(app: &mut App, offset: &str) {
         }
         if ofs < app.file_info.size {
             app.dialog_renderer = None;
+            app.state = UIState::Normal;
             app.goto(ofs);
         } else {
             app.dialog_renderer = Some(command_error_invalid_offset_draw);
