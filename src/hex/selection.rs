@@ -213,7 +213,7 @@ pub fn select_events(app: &mut App, key: KeyEvent) -> Result<bool> {
                     app.hex_view.selection.start,
                     app.hex_view.selection.end,
                 ));
-                
+
                 // sorting is needed to [] and {} keys work correctly
                 app.hex_view.blocks.sort_by_key(|k| k.start);
 

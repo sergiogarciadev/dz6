@@ -83,7 +83,9 @@ pub fn draw_hex_contents(app: &mut App, frame: &mut Frame, area: Rect) {
 
         for b in &app.hex_view.blocks {
             if offset >= b.start && offset <= b.end {
-                byte_style = Style::new().bg(Color::from_u32(b.color));
+                byte_style = Style::new()
+                    .bg(Color::from_u32(b.bg_color))
+                    .fg(Color::from_u32(b.fg_color));
                 col_len = 3;
             }
         }
