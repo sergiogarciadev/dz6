@@ -25,19 +25,16 @@ pub fn edit_events(app: &mut App, key: KeyEvent) -> Result<bool> {
             app.hex_view.editing_hex = true;
         }
 
-        KeyCode::Left | KeyCode::Backspace => {
-            if app.hex_view.offset > 0 {
-                app.goto(app.hex_view.offset - 1);
-            }
+        KeyCode::Left | KeyCode::Backspace if app.hex_view.offset > 0 => {
+            app.goto(app.hex_view.offset - 1);
         }
         KeyCode::Right => {
             app.goto(app.hex_view.offset + 1);
         }
-        KeyCode::Up => {
-            if app.hex_view.offset >= app.config.hex_mode_bytes_per_line {
-                app.goto(app.hex_view.offset - app.config.hex_mode_bytes_per_line);
-            }
+        KeyCode::Up if app.hex_view.offset >= app.config.hex_mode_bytes_per_line => {
+            app.goto(app.hex_view.offset - app.config.hex_mode_bytes_per_line);
         }
+
         KeyCode::Down => {
             app.goto(app.hex_view.offset + app.config.hex_mode_bytes_per_line);
         }
@@ -122,15 +119,15 @@ pub fn edit_events(app: &mut App, key: KeyEvent) -> Result<bool> {
                         app.dialog_renderer = Some(super::truncate::dialog_truncate);
                         app.state = UIState::DialogTruncate;
                     }
-                } else if c == '~' {
-                    if let Some(b) = app.read_u8(app.hex_view.offset) {
-                        if b.is_ascii_lowercase() {
-                            fill_with(app, b.to_ascii_uppercase(), true);
-                        } else if b.is_ascii_uppercase() {
-                            fill_with(app, b.to_ascii_lowercase(), true);
-                        } else {
-                            app.goto(app.hex_view.offset.saturating_add(1));
-                        }
+                } else if c == '~'
+                    && let Some(b) = app.read_u8(app.hex_view.offset)
+                {
+                    if b.is_ascii_lowercase() {
+                        fill_with(app, b.to_ascii_uppercase(), true);
+                    } else if b.is_ascii_uppercase() {
+                        fill_with(app, b.to_ascii_lowercase(), true);
+                    } else {
+                        app.goto(app.hex_view.offset.saturating_add(1));
                     }
                 }
             } else {

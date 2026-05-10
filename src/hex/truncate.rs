@@ -19,15 +19,13 @@ pub fn dialog_truncate(app: &mut App, frame: &mut Frame) {
 
 pub fn dialog_truncate_events(app: &mut App, event: &Event) -> Result<bool> {
     if let Event::Key(key) = event {
-        match key.code {
-            KeyCode::Char('y') => {
-                if let Some(f) = &app.file_info.file {
-                    f.set_len((app.hex_view.offset + 1) as u64)?;
-                    app.reload_file();
-                }
-            }
-            _ => {}
+        if let KeyCode::Char('y') = key.code
+            && let Some(f) = &app.file_info.file
+        {
+            f.set_len((app.hex_view.offset + 1) as u64)?;
+            app.reload_file();
         }
+
         app.dialog_renderer = None;
         app.state = UIState::Normal;
         app.hex_view.editing_hex = true;
@@ -46,20 +44,18 @@ pub fn dialog_reverse_truncate(app: &mut App, frame: &mut Frame) {
 
 pub fn dialog_reverse_truncate_events(app: &mut App, event: &Event) -> Result<bool> {
     if let Event::Key(key) = event {
-        match key.code {
-            KeyCode::Char('y') => {
-                let buff = &mut app.file_info.get_buffer().to_vec();
-                let new_buff = buff.drain(app.hex_view.offset..);
+        if let KeyCode::Char('y') = key.code {
+            let buff = &mut app.file_info.get_buffer().to_vec();
+            let new_buff = buff.drain(app.hex_view.offset..);
 
-                if let Some(f) = &mut app.file_info.file {
-                    f.write_all(new_buff.as_slice())?;
-                    f.set_len(new_buff.len() as u64)?;
-                    app.reload_file();
-                    app.goto(0);
-                }
+            if let Some(f) = &mut app.file_info.file {
+                f.write_all(new_buff.as_slice())?;
+                f.set_len(new_buff.len() as u64)?;
+                app.reload_file();
+                app.goto(0);
             }
-            _ => {}
         }
+
         app.dialog_renderer = None;
         app.state = UIState::Normal;
         app.hex_view.editing_hex = true;
