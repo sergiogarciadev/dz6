@@ -21,7 +21,7 @@ pub fn hex_mode_events(app: &mut App, key: KeyEvent) -> Result<bool> {
             }
             ofs = ofs.saturating_add_signed(delta);
             // this is needed because it can start at 0,
-            // but it cannot be zero afterward
+            // but it cannot be zero afterwards.
             // without it, `O` doesn't work at offset 0
             if ofs == 0 {
                 app.goto(0);
@@ -334,6 +334,41 @@ pub fn hex_mode_events(app: &mut App, key: KeyEvent) -> Result<bool> {
                 let _ = app.hex_view.changed_bytes.remove(&ofs);
             } else {
                 crate::beep!(); // beep if there's nothing to undo
+            }
+        }
+        // set a new random color for a colored block
+        KeyCode::Char('m') => {
+            if key.modifiers.contains(KeyModifiers::ALT) {
+                for b in &mut app.hex_view.blocks {
+                    if app.hex_view.offset >= b.start && app.hex_view.offset <= b.end {
+                        b.set_random_color();
+                        break;
+                    }
+                }
+            }
+        }
+        // go to the nearest previous block boundary
+        KeyCode::Char('[') => {
+            for b in app.hex_view.blocks.iter().rev() {
+                if b.end < app.hex_view.offset {
+                    app.goto(b.end);
+                    break;
+                } else if b.start < app.hex_view.offset {
+                    app.goto(b.start);
+                    break;
+                }
+            }
+        }
+        // go to the nearest next block boundary
+        KeyCode::Char(']') => {
+            for b in &app.hex_view.blocks {
+                if b.start > app.hex_view.offset {
+                    app.goto(b.start);
+                    break;
+                } else if b.end > app.hex_view.offset {
+                    app.goto(b.end);
+                    break;
+                }
             }
         }
         _ => {}
